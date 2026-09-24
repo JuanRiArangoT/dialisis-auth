@@ -5,15 +5,22 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     auth0_domain: str
+    auth0_client_id: str
+    auth0_client_secret: str
     auth0_audience: str
+    auth0_db_connection: str
 
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=False,
+        extra="ignore",
     )
 
 
 @lru_cache
 def get_settings() -> Settings:
-    return Settings()
+    return Settings()  # type: ignore[call-arg]
+
+
+settings = get_settings()

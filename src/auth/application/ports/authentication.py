@@ -1,15 +1,15 @@
+# src/auth/application/ports/authentication.py
 from abc import ABC, abstractmethod
-from ...domain.entities.user import UserRegistration, UserDocumentMetadata, AuthUser
+from typing import Any
 
-class IAuthIdentityProvider(ABC):
-    """Puerto de salida hacia el proveedor de identidad (Auth0)."""
+from ..dtos import RegisterUserCommand, UpdateDocumentCommand, UserOutputDTO
+
+
+class AuthenticationPort(ABC):
+    @abstractmethod
+    async def register(self, command: RegisterUserCommand) -> UserOutputDTO:
+        """Crea el usuario en el proveedor de identidad asignando el nombre al campo 'name'."""
 
     @abstractmethod
-    def register_user(self, data: UserRegistration) -> AuthUser:
-        """Crea el usuario registrando email, password y el campo estándar name."""
-        pass
-
-    @abstractmethod
-    def update_document_metadata(self, data: UserDocumentMetadata) -> dict:
-        """Actualiza el user_metadata con tipo y número de documento."""
-        pass
+    async def update_document_metadata(self, command: UpdateDocumentCommand) -> dict[str, Any]:
+        """Actualiza la metadata del perfil en el proveedor de identidad."""
