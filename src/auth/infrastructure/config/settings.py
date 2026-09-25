@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     auth0_client_id: str
     auth0_client_secret: str
     auth0_audience: str
+    auth0_api_audience: str
     auth0_db_connection: str
 
     model_config = SettingsConfigDict(
@@ -20,7 +21,7 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings() -> Settings:
-    return Settings()  # type: ignore[call-arg]
+    return Settings()
 
 
 settings = get_settings()

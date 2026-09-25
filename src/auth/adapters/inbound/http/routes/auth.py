@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from auth.adapters.inbound.http.dependencies.auth import (
+    get_current_user,
     get_register_user_use_case,
     get_update_document_use_case,
 )
@@ -11,6 +12,7 @@ from auth.adapters.inbound.http.schemas.update_document import (
     UpdateDocumentRequest,
 )
 from auth.adapters.inbound.http.schemas.user import UserResponse
+from auth.application.dtos.authenticated_user import AuthenticatedUserDTO
 from auth.application.dtos.register_user import RegisterUserCommand
 from auth.application.dtos.update_document import UpdateDocumentCommand
 from auth.application.use_cases.register_user import RegisterUserUseCase
@@ -65,3 +67,16 @@ async def update_document(
     )
 
     return await use_case.execute(command)
+
+@router.get(
+    "/me",
+    response_model=UserResponse,
+)
+async def get_me(
+    current_user: AuthenticatedUserDTO = Depends(get_current_user), # noqa: B008
+) -> UserResponse:
+    return UserResponse(
+        user_id=current_user.user_id,
+        email=current_user.email,
+        full_name=current_user.full_name,
+    )

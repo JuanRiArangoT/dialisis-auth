@@ -25,7 +25,16 @@ module-root = "src"
 [dependency-groups]
 dev = [
     "mypy>=2.3.1",
+    "pydantic[mypy]>=2.13.5",
     "pytest>=9.1.1",
     "pytest-asyncio>=1.4.0",
     "ruff>=0.16.9",
+]
+
+[tool.mypy]
+plugins = ["pydantic.mypy"]
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore:Using `httpx` with `starlette.testclient` is deprecated:starlette.exceptions.StarletteDeprecationWarning",
 ]
