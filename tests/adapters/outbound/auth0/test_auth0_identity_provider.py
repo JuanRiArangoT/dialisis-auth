@@ -7,6 +7,7 @@ from auth.adapters.outbound.auth0.auth0_identity_provider import (
 )
 from auth.application.dtos.register_user import RegisterUserCommand
 from auth.application.dtos.update_document import UpdateDocumentCommand
+from auth.application.dtos.user_output import UserOutputDTO
 
 
 @pytest.mark.asyncio
@@ -68,4 +69,16 @@ async def test_update_document_metadata() -> None:
         user_id="auth0|123",
         tipo_documento="CC",
         numero_documento="1234567890",
+    )
+
+async def get_user(
+    self,
+    user_id: str,
+) -> UserOutputDTO:
+    data = await self._management_client.get_user(user_id)
+
+    return UserOutputDTO(
+        user_id=data["user_id"],
+        email=data.get("email", ""),
+        full_name=data.get("name", ""),
     )

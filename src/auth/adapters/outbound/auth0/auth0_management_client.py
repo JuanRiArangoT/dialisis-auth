@@ -6,6 +6,7 @@ from auth.application.exceptions.identity_provider import (
     IdentityProviderAuthenticationError,
     IdentityProviderPermissionError,
     IdentityProviderRateLimitError,
+    IdentityProviderUnavailableError,
     IdentityProviderUserAlreadyExistsError,
 )
 from auth.infrastructure.config.settings import settings
@@ -31,12 +32,17 @@ class Auth0ManagementClient:
             "grant_type": "client_credentials",
         }
 
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                url,
-                json=payload,
-                timeout=10.0,
-            )
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    url,
+                    json=payload,
+                    timeout=10.0,
+                )
+        except httpx.RequestError as exc:
+            raise IdentityProviderUnavailableError(
+                "Identity provider is unavailable."
+            ) from exc
 
         if response.is_error:
             self._handle_error_response(response)
@@ -67,13 +73,18 @@ class Auth0ManagementClient:
             "verify_email": False,
         }
 
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                url,
-                json=payload,
-                headers=headers,
-                timeout=10.0,
-            )
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    url,
+                    json=payload,
+                    headers=headers,
+                    timeout=10.0,
+                )
+        except httpx.RequestError as exc:
+            raise IdentityProviderUnavailableError(
+                "Identity provider is unavailable."
+            ) from exc
 
         if response.is_error:
             self._handle_error_response(response)
@@ -102,13 +113,18 @@ class Auth0ManagementClient:
             }
         }
 
-        async with httpx.AsyncClient() as client:
-            response = await client.patch(
-                url,
-                json=payload,
-                headers=headers,
-                timeout=10.0,
-            )
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    url,
+                    json=payload,
+                    headers=headers,
+                    timeout=10.0,
+                )
+        except httpx.RequestError as exc:
+            raise IdentityProviderUnavailableError(
+                "Identity provider is unavailable."
+            ) from exc
 
         if response.is_error:
             self._handle_error_response(response)
@@ -139,3 +155,68 @@ class Auth0ManagementClient:
             )
 
         response.raise_for_status()
+
+    async def get_user(
+        self,
+        user_id: str,
+    ) -> dict[str, Any]:
+        token = await self._get_management_token()
+
+        url = f"{self._base_url}/api/v2/users/{user_id}"
+
+        headers = {
+            "Authorization": f"Bearer {token}",
+        }
+
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    url,
+                    headers=headers,
+                    timeout=10.0,
+                )
+        except httpx.RequestError as exc:
+            raise IdentityProviderUnavailableError(
+                "Identity provider is unavailable."
+            ) from exc
+
+        if response.is_error:
+            self._handle_error_response(response)
+
+        return response.json()
+
+
+    async def update_user_password(
+        self,
+        user_id: str,
+        password: str,
+    ) -> None:
+        token = await self._get_management_token()
+
+        url = f"{self._base_url}/api/v2/users/{user_id}"
+
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json",
+        }
+
+        payload = {
+            "password": password,
+            "connection": settings.auth0_db_connection,
+        }
+
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.patch(
+                    url,
+                    json=payload,
+                    headers=headers,
+                    timeout=10.0,
+                )
+        except httpx.RequestError as exc:
+            raise IdentityProviderUnavailableError(
+                "Identity provider is unavailable."
+            ) from exc
+
+        if response.is_error:
+            self._handle_error_response(response)

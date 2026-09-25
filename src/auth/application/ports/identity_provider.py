@@ -20,3 +20,10 @@ class IdentityProviderPort(ABC):
         command: UpdateDocumentCommand,
     ) -> dict[str, object]:
         ...
+        
+    @abstractmethod
+    async def get_user(
+        self,
+        user_id: str,
+    ) -> UserOutputDTO:
+        ...

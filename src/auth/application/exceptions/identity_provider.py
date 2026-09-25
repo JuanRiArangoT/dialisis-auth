@@ -16,3 +16,6 @@ class IdentityProviderRateLimitError(IdentityProviderError):
 
 class IdentityProviderUserAlreadyExistsError(IdentityProviderError):
     """Raised when trying to create an existing user."""
+
+class IdentityProviderUnavailableError(IdentityProviderError):
+    """Raised when the identity provider is unavailable."""

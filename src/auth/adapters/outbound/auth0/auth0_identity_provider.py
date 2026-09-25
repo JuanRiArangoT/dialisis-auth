@@ -43,3 +43,15 @@ class Auth0IdentityProvider(IdentityProviderPort):
         )
 
         return data
+
+    async def get_user(
+        self,
+        user_id: str,
+    ) -> UserOutputDTO:
+        data = await self._client.get_user(user_id)
+
+        return UserOutputDTO(
+            user_id=data["user_id"],
+            email=data.get("email", ""),
+            full_name=data.get("name", ""),
+        )
