@@ -1,0 +1,11 @@
+services:
+  auth:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: dialisis-auth:latest
+    container_name: dialisis-auth
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
