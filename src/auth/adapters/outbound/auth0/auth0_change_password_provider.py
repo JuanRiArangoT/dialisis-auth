@@ -59,7 +59,7 @@ class Auth0ChangePasswordProvider(ChangePasswordProviderPort):
                 "Identity provider is unavailable."
             ) from exc
 
-        if response.status_code in (400, 401):
+        if response.status_code in (400, 401, 403):
             raise InvalidCredentialsError(
                 "Invalid current password."
             )
