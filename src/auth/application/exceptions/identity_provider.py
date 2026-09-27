@@ -19,3 +19,7 @@ class IdentityProviderUserAlreadyExistsError(IdentityProviderError):
 
 class IdentityProviderUnavailableError(IdentityProviderError):
     """Raised when the identity provider is unavailable."""
+
+class IdentityProviderPasswordPolicyError(IdentityProviderError):
+
+    """Raised when the identity provider rejects a password."""

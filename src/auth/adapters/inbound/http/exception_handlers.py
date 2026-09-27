@@ -9,6 +9,7 @@ from auth.application.exceptions.email_verification import (
 )
 from auth.application.exceptions.identity_provider import (
     IdentityProviderAuthenticationError,
+    IdentityProviderPasswordPolicyError,
     IdentityProviderPermissionError,
     IdentityProviderRateLimitError,
     IdentityProviderUnavailableError,
@@ -43,6 +44,18 @@ async def identity_provider_permission_handler(
         },
     )
 
+async def identity_provider_password_policy_handler(
+    request: Request,
+    exc: Exception,
+) -> JSONResponse:
+    assert isinstance(exc, IdentityProviderPasswordPolicyError)
+
+    return JSONResponse(
+        status_code=400,
+        content={
+            "detail": "Password does not meet the required policy.",
+        },
+    )
 
 async def identity_provider_rate_limit_handler(
     request: Request,

@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from auth.adapters.inbound.http.exception_handlers import (
     email_not_verified_handler,
     identity_provider_authentication_handler,
+    identity_provider_password_policy_handler,
     identity_provider_permission_handler,
     identity_provider_rate_limit_handler,
     identity_provider_unavailable_handler,
@@ -20,6 +21,7 @@ from auth.application.exceptions.email_verification import (
 )
 from auth.application.exceptions.identity_provider import (
     IdentityProviderAuthenticationError,
+    IdentityProviderPasswordPolicyError,
     IdentityProviderPermissionError,
     IdentityProviderRateLimitError,
     IdentityProviderUnavailableError,
@@ -86,4 +88,9 @@ app.add_exception_handler(
 app.add_exception_handler(
     EmailNotVerifiedError,
     email_not_verified_handler,
+)
+
+app.add_exception_handler(
+    IdentityProviderPasswordPolicyError,
+    identity_provider_password_policy_handler,
 )

@@ -4,6 +4,7 @@ import httpx
 
 from auth.application.exceptions.identity_provider import (
     IdentityProviderAuthenticationError,
+    IdentityProviderPasswordPolicyError,
     IdentityProviderPermissionError,
     IdentityProviderRateLimitError,
     IdentityProviderUnavailableError,
@@ -152,6 +153,11 @@ class Auth0ManagementClient:
         if response.status_code == 429:
             raise IdentityProviderRateLimitError(
                 "Identity provider rate limit exceeded."
+            )
+
+        if response.status_code == 400 and "PasswordStrengthError" in response.text:
+            raise IdentityProviderPasswordPolicyError(
+                "Password does not meet the identity provider policy."
             )
 
         response.raise_for_status()
