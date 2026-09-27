@@ -1,5 +1,6 @@
 # src/auth/main.py
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from auth.adapters.inbound.http.exception_handlers import (
     email_not_verified_handler,
@@ -31,12 +32,26 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Configuración CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Conectar el adaptador de entrada HTTP
 app.include_router(auth_router)
+
 
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "auth-microservice"}
+
 
 app.add_exception_handler(
     IdentityProviderAuthenticationError,
